@@ -88,6 +88,7 @@ export default function App() {
   const [activePreview, setActivePreview] = useState(null);
   const [editingScheduleName, setEditingScheduleName] = useState(false);
   const [scheduleNameDraft, setScheduleNameDraft] = useState('');
+  const [copiedTimeSlot, setCopiedTimeSlot] = useState('');
   const dragDepth = useRef(0);
   const activeSchedule = schedules.find((schedule) => schedule.id === activeId) || schedules[0];
   const { preview, candidatesCount, stoppedAt, invalidOrderEvents } = useMemo(
@@ -177,6 +178,13 @@ export default function App() {
 
   function removeTimeSlot(index) {
     updateSlots((slots) => slots.filter((_, slotIndex) => slotIndex !== index));
+  }
+
+  function pasteTimeSlot(index) {
+    if (!copiedTimeSlot) return;
+    updateSlots((slots) => slots.map((slot, slotIndex) => (
+      slotIndex === index ? copiedTimeSlot : slot
+    )));
   }
 
   function updateEvent(field, fileIndex, value) {
@@ -425,15 +433,16 @@ export default function App() {
             {(activeSchedule?.slots || []).map((value, index) => (
               <div className="slot-field" key={`${activeId}-${index}`}>
                 <span>{String(index + 1).padStart(2, '0')}</span>
-                <input
-                  aria-label={`시간표 ${index + 1}번 시각`}
-                  type="time"
-                  step="0.001"
+                <TimeSlotInput
+                  key={`${activeId}-${index}-${value}`}
                   value={value}
-                  onChange={(event) => updateSlot(index, event.target.value)}
+                  label={`시간표 ${index + 1}번 시각`}
                   disabled={busy}
+                  onCommit={(nextValue) => updateSlot(index, nextValue)}
                 />
                 <div className="slot-actions">
+                  <button className="slot-action-button" type="button" onClick={() => setCopiedTimeSlot(value)} disabled={busy || !value} aria-label={`${index + 1}번 시간 슬롯 복사`} title="시간 슬롯 복사">⧉</button>
+                  <button className="slot-action-button" type="button" onClick={() => pasteTimeSlot(index)} disabled={busy || !copiedTimeSlot} aria-label={`${index + 1}번 칸에 복사한 시간 붙여넣기`} title="복사한 시간 붙여넣기">↧</button>
                   <button className="slot-action-button" type="button" onClick={() => insertTimeSlotAfter(index)} disabled={busy} aria-label={`${index + 1}번 뒤에 시간 슬롯 삽입`} title="이 슬롯 다음에 삽입">+</button>
                   <button className="slot-action-button remove" type="button" onClick={() => removeTimeSlot(index)} disabled={busy} aria-label={`${index + 1}번 시간 슬롯 삭제`} title="이 슬롯 삭제">−</button>
                 </div>
@@ -589,6 +598,24 @@ function VideoPreview({ file, onClose }) {
       <video ref={videoRef} controls playsInline preload="metadata" />
       {playbackError && <div className="alert error">{playbackError}</div>}
     </section>
+  );
+}
+
+function TimeSlotInput({ value, label, disabled, onCommit }) {
+  function handleBlur(event) {
+    const normalized = timeFromSlot(event.currentTarget.value);
+    if (normalized !== value) onCommit(normalized);
+  }
+
+  return (
+    <input
+      aria-label={label}
+      type="time"
+      step="0.001"
+      defaultValue={value}
+      onBlur={handleBlur}
+      disabled={disabled}
+    />
   );
 }
 

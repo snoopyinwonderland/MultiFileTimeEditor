@@ -49,7 +49,7 @@ h2 { margin: 0 0 5px; color: #202b3f; font-size: 17px; }
 .slot-field input { width: 100%; min-width: 0; height: 34px; padding: 4px 8px; border: 1px solid #dce3ed; border-radius: 7px; color: #29364a; background: #fff; font-size: 12px; }
 .slot-field input:focus, .event-input input:focus { border-color: var(--accent); outline: 2px solid rgba(105, 82, 216, .12); }
 .slot-actions { display: flex; gap: 3px; flex: 0 0 auto; }
-.slot-action-button { width: 27px; height: 27px; padding: 0; border: 1px solid #dce3ed; border-radius: 6px; color: var(--accent-dark); background: #fff; font-size: 16px; line-height: 1; }
+.slot-action-button { width: 27px; height: 27px; padding: 0; border: 1px solid #dce3ed; border-radius: 6px; color: var(--accent-dark); background: #fff; font-size: 14px; line-height: 1; }
 .slot-action-button:hover:not(:disabled) { border-color: #b9afea; background: #f6f4ff; }
 .slot-action-button.remove { color: #9a3934; }
 .slot-action-button.remove:hover:not(:disabled) { border-color: #e4b5b2; background: #fff6f5; }
