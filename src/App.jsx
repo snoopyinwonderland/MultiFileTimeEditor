@@ -426,7 +426,7 @@ export default function App() {
           </div>
           <div className="schedule-tools">
             <strong>{activeSchedule?.slots.length || 0}개 시각 입력란</strong>
-            <span>연·월·일 없이 시:분:초.밀리초까지 입력합니다. 빈 칸은 건너뛰고 앞에서 뒤 순서로 입력하세요.</span>
+            <span>연·월·일 없이 시:분:초.밀리초까지 입력합니다. 시를 바꾸면 뒤 슬롯도 이동하며, 자정 경계에서는 오전/오후로 순환하지 않습니다. 빈 칸은 건너뜁니다.</span>
             <button className="text-button" type="button" onClick={addTimeSlot}>+ 입력란 추가</button>
           </div>
           <div className="slot-grid">

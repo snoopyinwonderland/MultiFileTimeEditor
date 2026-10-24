@@ -79,6 +79,20 @@ test('shifts later timetable slots by the edited slot hour delta', () => {
   assert.deepEqual(slots, ['07:11:11.111', '07:11:11.777', '08:00:00.001', '', '09:30:00.100']);
 });
 
+test('does not wrap later slots across midnight when shifting hours', () => {
+  const slots = ['23:10:00.000', '23:45:00.000', '22:30:00.000'];
+  const updated = shiftSubsequentSlotsForHourChange(slots, 0, '00:10:00.000');
+
+  assert.deepEqual(updated, ['00:10:00.000', '23:45:00.000', '22:30:00.000']);
+});
+
+test('treats midnight-adjacent hour edits as a one-hour shift', () => {
+  const slots = ['23:00:00.000', '01:30:00.000', '03:00:00.000'];
+  const updated = shiftSubsequentSlotsForHourChange(slots, 0, '00:00:00.000');
+
+  assert.deepEqual(updated, ['00:00:00.000', '02:30:00.000', '04:00:00.000']);
+});
+
 test('manually editing a file creation time does not change the previous file modification time', () => {
   const files = [
     { path: 'one.ts', name: 'one.ts', size: 1_000_000 },

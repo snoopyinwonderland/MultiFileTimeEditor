@@ -29,9 +29,12 @@ export function shiftSubsequentSlotsForHourChange(slots, editedIndex, nextValue)
   const previousTime = normalizedTime(slots[editedIndex]);
   if (!nextTime) return slots;
 
-  const hourDelta = previousTime
+  let hourDelta = previousTime
     ? Number(nextTime.slice(0, 2)) - Number(previousTime.slice(0, 2))
     : 0;
+  // Interpret 23 -> 00 and 00 -> 23 as a one-hour adjustment, not a 23-hour jump.
+  if (hourDelta > 12) hourDelta -= 24;
+  if (hourDelta < -12) hourDelta += 24;
   const updated = [...slots];
   updated[editedIndex] = nextTime;
   if (hourDelta === 0) return updated;
@@ -43,7 +46,10 @@ export function shiftSubsequentSlotsForHourChange(slots, editedIndex, nextValue)
     const [clock, fraction] = time.split('.');
     const [hour, minute, second] = clock.split(':').map(Number);
     const milliseconds = ((hour * 60 + minute) * 60 + second) * 1000 + Number(fraction);
-    const shifted = ((milliseconds + hourDelta * 60 * 60 * 1000) % dayMilliseconds + dayMilliseconds) % dayMilliseconds;
+    const shifted = milliseconds + hourDelta * 60 * 60 * 1000;
+    // Schedule slots have no date component, so wrapping across midnight would silently
+    // flip an afternoon slot into the morning. Leave this and later slots alone instead.
+    if (shifted < 0 || shifted >= dayMilliseconds) break;
     const shiftedHour = Math.floor(shifted / 3_600_000);
     const shiftedMinute = Math.floor((shifted % 3_600_000) / 60_000);
     const shiftedSecond = Math.floor((shifted % 60_000) / 1000);
